@@ -1,9 +1,9 @@
 import {Component, input} from '@angular/core';
 import {HousingLocationInfo} from '../housinglocation';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink],
   selector: 'app-housing-location',
   template: `
     <section class="listing">
