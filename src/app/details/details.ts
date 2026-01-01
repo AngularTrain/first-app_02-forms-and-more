@@ -2,7 +2,7 @@ import {Component, inject, ChangeDetectorRef} from '@angular/core'; // SW: added
 import {ActivatedRoute} from '@angular/router';
 import {HousingService} from '../housing';
 import {HousingLocationInfo} from '../housinglocation';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-details', // SW: undo previousselector change as it was messing things up.
@@ -30,14 +30,43 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
       </section>
       <section class="listing-apply">
         <h2 class="section-heading">Apply now to live here</h2>
-        <form [formGroup]="applyForm" (submit)="submitApplication()">
+        <form [formGroup]="applyForm" (ngSubmit)="submitApplication()">
           <label for="first-name">First Name</label>
           <input id="first-name" type="text" formControlName="firstName" />
+          @if (applyForm.get('firstName')?.invalid && (applyForm.get('firstName')?.touched || applyForm.get('firstName')?.dirty)) {
+            @if (applyForm.get('firstName')?.errors?.['required']) {
+            <div class="error-message"> 
+              First Name is required.
+            </div>
+          }
+            @if (applyForm.get('firstName')?.errors?.['minlength']) {
+            <div class="error-message">
+              First Name must be at least 2 characters long.
+            </div>
+          }
+        }
           <label for="last-name">Last Name</label>
           <input id="last-name" type="text" formControlName="lastName" />
+          @if (applyForm.get('lastName')?.invalid && (applyForm.get('lastName')?.touched || applyForm.get('lastName')?.dirty)) {
+            @if (applyForm.get('lastName')?.errors?.['required']) {
+            <div class="error-message">
+              Last Name is required.
+            </div>
+            }
+            @if (applyForm.get('lastName')?.errors?.['minlength']) {
+            <div class="error-message">
+              Last Name must be at least 2 characters long.
+            </div>
+            }
+          }
           <label for="email">Email</label>
           <input id="email" type="email" formControlName="email" />
-          <button type="submit" class="primary">Apply now</button>
+          @if (applyForm.get('email')?.invalid && (applyForm.get('email')?.touched || applyForm.get('email')?.dirty)) {
+            <div class="error-message">
+              A valid Email is required.
+            </div>
+          }
+          <button type="submit" class="primary" [disabled]="applyForm.invalid">Apply now</button>
         </form>
       </section>
       } @else {
@@ -51,11 +80,22 @@ export class Details {
   route: ActivatedRoute = inject(ActivatedRoute);
   housingService = inject(HousingService);
   housingLocation?: HousingLocationInfo;
+
   applyForm = new FormGroup({
-    firstName: new FormControl(''),
-    lastName: new FormControl(''),
-    email: new FormControl(''),
-  });
+  firstName: new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(2)]
+  }),
+  lastName: new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(2)]
+  }),
+  email: new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.email]
+  }),
+});
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { // SW: added ChangeDetectorRef injection
     const housingLocationId = parseInt(this.route.snapshot.params['id'], 10);
     this.housingService.getHousingLocationById(housingLocationId).then((housingLocation) => {
