@@ -5,7 +5,7 @@ import {HousingLocationInfo} from '../housinglocation';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
-  selector: 'app-details', // SW: undo previousselector change as it was messing things up.
+  selector: 'app-details', // SW: undo previous selector change as it was messing things up.
   imports: [ReactiveFormsModule],
   template: `
     <article>
