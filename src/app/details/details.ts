@@ -29,6 +29,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
         </ul>
       </section>
       <section class="listing-apply">
+        @if (!submitted) {
         <h2 class="section-heading">Apply now to live here</h2>
         <form [formGroup]="applyForm" (ngSubmit)="submitApplication()">
           <label for="first-name">First Name</label>
@@ -68,6 +69,18 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
           }
           <button type="submit" class="primary" [disabled]="applyForm.invalid">Apply now</button>
         </form>
+        } @else {
+          <div class="success">
+          <h2 class="section-heading">Application submitted</h2>
+          <p>Thank you {{ submittedData?.firstName }} {{ submittedData?.lastName }} for applying to live at {{ housingLocation.name }}.</p>
+          <p>We will review your application and get back to you soon at {{ submittedData?.email }}.</p>
+          <br/>
+          <br/>
+          <button type="button" class="primary" (click)="startAnotherApplication()">
+            Apply again
+          </button>
+        </div>
+        }
       </section>
       } @else {
       <p>Listing not found.</p>
@@ -77,6 +90,8 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   styleUrls: ['./details.css'],
 })
 export class Details {
+  submitted: boolean = false;
+  submittedData?: {firstName: string; lastName: string; email: string};
   route: ActivatedRoute = inject(ActivatedRoute);
   housingService = inject(HousingService);
   housingLocation?: HousingLocationInfo;
@@ -104,10 +119,21 @@ export class Details {
     });
   }
   submitApplication() {
+    if (this.applyForm.invalid) {
+      return;
+    }
     this.housingService.submitApplication(
       this.applyForm.value.firstName ?? '',
       this.applyForm.value.lastName ?? '',
       this.applyForm.value.email ?? '',
     );
+    this.submittedData = this.applyForm.value as {firstName: string; lastName: string; email: string};
+    this.submitted = true;
+    this.applyForm.reset();
+  }
+
+  startAnotherApplication() {
+    this.submitted = false;
+    this.submittedData = undefined;
   }
 }

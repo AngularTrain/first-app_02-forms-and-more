@@ -78,6 +78,13 @@ input {
   cursor: not-allowed;
 }
 
+.success {
+  border: 1px solid #cfe9d6;
+  background: #eef9f1;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
 @media (max-width: 1024px) {
   .listing-photo {
     width: 100%;
