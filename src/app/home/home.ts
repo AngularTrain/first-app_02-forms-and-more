@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectorRef} from '@angular/core'; // SW: added ChangeDetectorRef import
 import {HousingLocation} from '../housing-location/housing-location';
 import {HousingLocationInfo} from '../housinglocation';
 import {HousingService} from '../housing';
@@ -25,9 +25,14 @@ export class Home {
   housingLocationList: HousingLocationInfo[] = [];
   filteredLocationList: HousingLocationInfo[] = [];
   housingService: HousingService = inject(HousingService);
-  constructor() {
-    this.housingLocationList = this.housingService.getAllHousingLocations();
-    this.filteredLocationList = this.housingLocationList;
+  constructor(private changeDetectorRef: ChangeDetectorRef) { // SW: added ChangeDetectorRef injection
+    this.housingService
+      .getAllHousingLocations()
+      .then((housingLocationList: HousingLocationInfo[]) => {
+        this.housingLocationList = housingLocationList;
+        this.filteredLocationList = housingLocationList;
+        this.changeDetectorRef.markForCheck();
+      });
   }
   filterResults(text: string) {
     if (!text) {
