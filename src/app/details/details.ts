@@ -67,6 +67,20 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
               A valid Email is required.
             </div>
           }
+          <label for="phone">Phone Number</label>
+          <input id="phone" type="tel" formControlName="phone" />
+          @if (applyForm.get('phone')?.invalid && (applyForm.get('phone')?.touched || applyForm.get('phone')?.dirty)) {
+            @if (applyForm.get('phone')?.errors?.['required']) {
+            <div class="error-message">
+              Phone Number is required.
+            </div>
+            }
+            @if (applyForm.get('phone')?.errors?.['pattern']) {
+            <div class="error-message">
+              Phone Number must be valid.
+            </div>
+            }
+          }
           <button type="submit" class="primary" [disabled]="applyForm.invalid">Apply now</button>
         </form>
         } @else {
@@ -109,6 +123,13 @@ export class Details {
     nonNullable: true,
     validators: [Validators.required, Validators.email]
   }),
+  phone: new FormControl('', {
+  nonNullable: true,
+  validators: [
+    Validators.required,
+    Validators.pattern(/^[\d\s()+-]{7,}$/)
+  ]
+  }),
 });
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { // SW: added ChangeDetectorRef injection
@@ -126,6 +147,7 @@ export class Details {
       this.applyForm.value.firstName ?? '',
       this.applyForm.value.lastName ?? '',
       this.applyForm.value.email ?? '',
+      this.applyForm.value.phone ?? '',
     );
     this.submittedData = this.applyForm.value as {firstName: string; lastName: string; email: string};
     this.submitted = true;

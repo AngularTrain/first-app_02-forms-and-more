@@ -20,10 +20,10 @@ export class HousingService {
       return locationJson[0] as HousingLocationInfo | undefined;
     }
 
-    submitApplication(firstName: string, lastName: string, email: string) {
+    submitApplication(firstName: string, lastName: string, email: string, phone: string): void {
 
     console.log(
-      `Homes application received: firstName: ${firstName}, lastName: ${lastName}, email: ${email}.`,
+      `Homes application received: firstName: ${firstName}, lastName: ${lastName}, email: ${email}, phone: ${phone}.`,
     );
   }
   
