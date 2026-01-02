@@ -4,6 +4,13 @@ import {HousingService} from '../housing';
 import {HousingLocationInfo} from '../housinglocation';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
+type SubmittedApplication = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  }
+
 @Component({
   selector: 'app-details', // SW: undo previous selector change as it was messing things up.
   imports: [ReactiveFormsModule],
@@ -103,9 +110,12 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   `,
   styleUrls: ['./details.css'],
 })
+
+
 export class Details {
+  
   submitted: boolean = false;
-  submittedData?: {firstName: string; lastName: string; email: string};
+  submittedData?: SubmittedApplication;
   route: ActivatedRoute = inject(ActivatedRoute);
   housingService = inject(HousingService);
   housingLocation?: HousingLocationInfo;
@@ -149,7 +159,7 @@ export class Details {
       this.applyForm.value.email ?? '',
       this.applyForm.value.phone ?? '',
     );
-    this.submittedData = this.applyForm.value as {firstName: string; lastName: string; email: string};
+    this.submittedData = this.applyForm.value as SubmittedApplication;
     this.submitted = true;
     this.applyForm.reset();
   }
