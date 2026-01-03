@@ -3,13 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {HousingService} from '../housing';
 import {HousingLocationInfo} from '../housinglocation';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-
-type SubmittedApplication = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  }
+import { SubmittedApplication } from '../submitted-application';
 
 @Component({
   selector: 'app-details', // SW: undo previous selector change as it was messing things up.
@@ -153,12 +147,7 @@ export class Details {
     if (this.applyForm.invalid) {
       return;
     }
-    this.housingService.submitApplication(
-      this.applyForm.value.firstName ?? '',
-      this.applyForm.value.lastName ?? '',
-      this.applyForm.value.email ?? '',
-      this.applyForm.value.phone ?? '',
-    );
+    this.housingService.submitApplication(this.applyForm.value as SubmittedApplication);
     this.submittedData = this.applyForm.value as SubmittedApplication;
     this.submitted = true;
     this.applyForm.reset();

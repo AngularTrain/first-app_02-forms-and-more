@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HousingLocationInfo } from './housinglocation';
+import { SubmittedApplication } from './submitted-application';
 
 @Injectable({
   providedIn: 'root',
@@ -20,10 +21,10 @@ export class HousingService {
       return locationJson[0] as HousingLocationInfo | undefined;
     }
 
-    submitApplication(firstName: string, lastName: string, email: string, phone: string): void {
+    submitApplication(application: SubmittedApplication): void {
 
     console.log(
-      `Homes application received: firstName: ${firstName}, lastName: ${lastName}, email: ${email}, phone: ${phone}.`,
+      `Homes application received: firstName: ${application.firstName}, lastName: ${application.lastName}, email: ${application.email}, phone: ${application.phone}.`,
     );
   }
   
