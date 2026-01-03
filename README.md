@@ -8,6 +8,8 @@ This was the final change to housing tutorial from Angular, thus completing that
 
 Addition of model-based validators.
 
+This change brings us to the end of Day 3 Block 1.
+
 ## Typo
 
 Trivial.
@@ -15,6 +17,8 @@ Trivial.
 ## Details form now appears to do something at UI level.
 
 These changes are substantial and require a good bit of coding. UX is greatly enhanced.
+
+This change brings us to the end of Day 3 Block 2. (Block 2 is a long block.)
 
 ## Added README. Added phone field.
 
@@ -27,6 +31,12 @@ Title says it all. Before this, handling of submitted detail was getting messy.
 ## Promoted SubmittedApplication to Interface.
 
 Ensures consistency between details.ts and housing.ts and makes code a little neater.
+
+## Used signals for UI state.
+
+Several updates to details.ts to use Signals instead. The computed signal makes the template markup a tiny bit cleaner. No other changes to other files.
+
+This change brings us to the end of Day 3 Block 3.
 
 # Technical Notes
 

@@ -4,6 +4,7 @@ import {HousingService} from '../housing';
 import {HousingLocationInfo} from '../housinglocation';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { SubmittedApplication } from '../submitted-application';
+import { signal, computed, effect } from '@angular/core';
 
 @Component({
   selector: 'app-details', // SW: undo previous selector change as it was messing things up.
@@ -30,7 +31,7 @@ import { SubmittedApplication } from '../submitted-application';
         </ul>
       </section>
       <section class="listing-apply">
-        @if (!submitted) {
+        @if (!submitted()) {
         <h2 class="section-heading">Apply now to live here</h2>
         <form [formGroup]="applyForm" (ngSubmit)="submitApplication()">
           <label for="first-name">First Name</label>
@@ -49,7 +50,7 @@ import { SubmittedApplication } from '../submitted-application';
         }
           <label for="last-name">Last Name</label>
           <input id="last-name" type="text" formControlName="lastName" />
-          @if (applyForm.get('lastName')?.invalid && (applyForm.get('lastName')?.touched || applyForm.get('lastName')?.dirty)) {
+          @if (applyForm.get('lastName')?.invalid && (applyForm.get('lastName')?.touched || applyForm.get('lastName')?.dirty || submitAttempted())) {
             @if (applyForm.get('lastName')?.errors?.['required']) {
             <div class="error-message">
               Last Name is required.
@@ -63,14 +64,14 @@ import { SubmittedApplication } from '../submitted-application';
           }
           <label for="email">Email</label>
           <input id="email" type="email" formControlName="email" />
-          @if (applyForm.get('email')?.invalid && (applyForm.get('email')?.touched || applyForm.get('email')?.dirty)) {
+          @if (applyForm.get('email')?.invalid && (applyForm.get('email')?.touched || applyForm.get('email')?.dirty || submitAttempted())) {
             <div class="error-message">
               A valid Email is required.
             </div>
           }
           <label for="phone">Phone Number</label>
           <input id="phone" type="tel" formControlName="phone" />
-          @if (applyForm.get('phone')?.invalid && (applyForm.get('phone')?.touched || applyForm.get('phone')?.dirty)) {
+          @if (applyForm.get('phone')?.invalid && (applyForm.get('phone')?.touched || applyForm.get('phone')?.dirty || submitAttempted())) {
             @if (applyForm.get('phone')?.errors?.['required']) {
             <div class="error-message">
               Phone Number is required.
@@ -87,8 +88,7 @@ import { SubmittedApplication } from '../submitted-application';
         } @else {
           <div class="success">
           <h2 class="section-heading">Application submitted</h2>
-          <p>Thank you {{ submittedData?.firstName }} {{ submittedData?.lastName }} for applying to live at {{ housingLocation.name }}.</p>
-          <p>We will review your application and get back to you soon at {{ submittedData?.email }}.</p>
+          <p>{{ successLine() }}</p>
           <br/>
           <br/>
           <button type="button" class="primary" (click)="startAnotherApplication()">
@@ -108,11 +108,19 @@ import { SubmittedApplication } from '../submitted-application';
 
 export class Details {
   
-  submitted: boolean = false;
-  submittedData?: SubmittedApplication;
+  submitted = signal(false);
+  submitAttempted = signal(false);
+  submittedData = signal <SubmittedApplication | null>(null);
   route: ActivatedRoute = inject(ActivatedRoute);
   housingService = inject(HousingService);
   housingLocation?: HousingLocationInfo;
+
+  successLine = computed(() => {
+    const data = this.submittedData();
+    if (!data) return '';
+    return `Thanks, ${data.firstName} ${data.lastName}. A confirmation email will be sent to ${data.email}.`;
+  });
+
 
   applyForm = new FormGroup({
   firstName: new FormControl('', {
@@ -142,19 +150,33 @@ export class Details {
       this.housingLocation = housingLocation;
       this.changeDetectorRef.markForCheck();
     });
+
+    effect(() => {
+    if (this.submitted()) {
+      console.log('Application submitted:', this.submittedData());
+    }
+    
+  });
+
   }
   submitApplication() {
-    if (this.applyForm.invalid) {
-      return;
-    }
-    this.housingService.submitApplication(this.applyForm.value as SubmittedApplication);
-    this.submittedData = this.applyForm.value as SubmittedApplication;
-    this.submitted = true;
-    this.applyForm.reset();
+  this.submitAttempted.set(true);
+
+  if (this.applyForm.invalid) {
+    this.applyForm.markAllAsTouched();
+    return;
   }
 
+  this.submittedData.set(this.applyForm.getRawValue());
+  this.submitted.set(true);
+  this.housingService.submitApplication(this.submittedData() as SubmittedApplication);
+  this.applyForm.reset();
+}
+
+
   startAnotherApplication() {
-    this.submitted = false;
-    this.submittedData = undefined;
-  }
+  this.submitted.set(false);
+  this.submittedData.set(null);
+  this.submitAttempted.set(false);
+}
 }
